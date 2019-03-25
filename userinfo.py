@@ -1,6 +1,6 @@
 import os
 import requests
-from fake_useragent import UserAgent
+from fake_useragent import UserAgent #fake_useragent
 import threading  #多线程
 import time   #记录运行时间
 import middle
@@ -41,12 +41,6 @@ def download(a,b,c):
             #print(r.apparent_encoding)
             print("Thread:"+str(c))
 
-            #try:
-#                r.encoding='uft-8'
- #           except:
-  #              # f = open(str(os.getcwd()) + '\\testuser\\'+str(a)+r'\user_info_log.txt', 'a')
-   #             f.write('user '+str(i) + ':encoding fail\n')
-    #            f.close()
 
 
             #f1=open(str(os.getcwd())+r'\userinfo\user_information_'+str(i)+'.html','w')
@@ -73,7 +67,7 @@ def download(a,b,c):
 
 
 #threads=[]
-
+#test for a little amount of users
 t1 = threading.Thread(target=download,args=(1,100,'1'))
 t2 = threading.Thread(target=download,args=(100,200,'2'))
 t3 = threading.Thread(target=download,args=(200,300,'3'))
@@ -85,8 +79,6 @@ t5 = threading.Thread(target=download,args=(400,500,'5'))
 
 if __name__ == '__main__':
     try:
-        #download(1,500,'T')
-
         t1.start()
         t2.start()
         t3.start()
@@ -94,7 +86,7 @@ if __name__ == '__main__':
         t5.start()
 
         #t6.start()
-            #threads.start_new_threa(download, (101, 200, "Thread2"))
+        
     except:
         print("error starting thread")
 
