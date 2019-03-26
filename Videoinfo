@@ -1,0 +1,111 @@
+#http://www.acfun.cn/content_view.aspx?contentId=4734700
+
+
+import os
+import requests
+from fake_useragent import UserAgent
+import threading  #多线程
+import time   #记录运行时间
+import middle
+import random
+
+target ='videoinfo'
+
+
+r=random.random()
+
+ua = UserAgent()
+headers = {'Accept': 'text/html, application/xhtml+xml, image/jxr, */*',
+           'Accept - Encoding': 'gzip, deflate',
+           'Accept-Language': 'zh-Hans-CN, zh-Hans; q=0.5',
+           'Connection': 'Keep-Alive',
+           'User-Agent': ua.random}
+
+def download(a,b,c,mode):
+    if mode == 0:  # mode为1是正常读取状态，为0是断点重传状态。
+        if os.path.exists('current.txt'):  # 如果该文件存在即之前有过下载，current.txt记录下载断点
+            f= open('current.txt','r')
+            log = f.read()
+            f.close() #断电重传
+            mode = 1
+            download(log,b,c,mode)
+
+    else:
+        start=time.time()
+        middle.mkdir(os.curdir+'\\'+target+'\\'+str(a))
+        current_position = str(os.getcwd()) + '\\'+target+'\\' + str(a) + r'\current.txt'
+        for i in range(a,b):
+            url = '#http://www.acfun.cn/content_view.aspx?contentId=' + str(i)
+            print(url)
+
+            try:
+                # urllib.request.urlretrieve(req,currentD)  #不改header直接下载
+                r = requests.get(url, headers=headers, timeout=3)
+                current_position = str(os.getcwd()) + '\\'+target+'\\' + str(a) + r'\current.txt'
+                middle.write_to_file(current_position,'w',str(i)) #记录当前位置
+                time.sleep(random.random()+random.randint(1,2))
+
+                if r.status_code == 200 or r.status_code ==201: #正常请求 ->写入文件
+                    f1 = open(str(os.getcwd()) + r'\videoinfo\\'+str(a)+r'\video_info_' + str(i) + '.html', 'w') #test
+                    for line in r.text: #写入文件
+                        f1.writelines(line)
+                    f1.close()
+
+                else:#非正常请求 ->不写入文件+ 记录
+                    print("error!status code:"+str(r.status_code))
+                    status_code_error_path = str(os.getcwd()) + '\\videoinfo\\'+str(a)+r'\video_log.txt'
+                    middle.write_to_file(status_code_error_path,'a','video ' + str(i) + ':status code =' + str(r.status_code)+'\n')
+                    middle.write_to_file('retry.txt','a',str(i)+'\n')
+                print("Thread:" + str(c))
+            except Exception:
+                print("fail to get the site")
+                f = open('log.txt','a',encoding='utf-8')
+                f.write('video '+str(i)+':Wrong with site.\n')
+                f.close()
+        end = time.time()
+        cost=end-start
+        middle.write_to_file(current_position,'a',"\nDone\n"+'time='+str(cost)+' seconds') #运行时间 单位：second
+
+
+def download1(uid):
+    #url = 'http://www.acfun.cn/usercard.aspx?uid=' + str(uid)
+    url = 'http://www.acfun.cn/content_view.aspx?contentId=' + str(uid)
+    r = requests.get(url, headers=headers, timeout=3)
+    if r.status_code == 200 or r.status_code == 201:
+        f1 = open(str(os.getcwd()) + '\\videoinfo\\retry\\'+ 'video_info_'+str(uid) + '.html', 'w')  # test
+        for line in r.text:  # 写入文件
+            f1.writelines(line)
+        f1.close()
+        return 1 #下载成功
+    else:
+        print("Fail")
+        return 0 #下载失败，错误
+
+def retry(logtext,retrytime):
+   pass
+
+# 还需要写一个删除记录文件中该id的函数!!!
+
+t1 = threading.Thread(target=download,args=(1,10,'1',1))
+t2 = threading.Thread(target=download,args=(10,20,'2',1))
+t3 = threading.Thread(target=download,args=(20,30,'3',1))
+t4 = threading.Thread(target=download,args=(30,40,'4',1))
+t5 = threading.Thread(target=download,args=(40,50,'5',1))
+# t5 = threading.Thread(target=download,args=(40,50,'5'))
+
+#threads.append(t1)
+#threads.append(t2)
+
+if __name__ == '__main__':
+
+    try:
+
+        t1.start()
+        t2.start()
+        t3.start()
+        t4.start()
+        t5.start()
+            #threads.start_new_threa(download, (101, 200, "Thread2"))
+    except:
+       print("error starting thread")
+
