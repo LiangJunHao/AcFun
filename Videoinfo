@@ -35,7 +35,7 @@ def download(a,b,c,mode):
         middle.mkdir(os.curdir+'\\'+target+'\\'+str(a))
         current_position = str(os.getcwd()) + '\\'+target+'\\' + str(a) + r'\current.txt'
         for i in range(a,b):
-            url = '#http://www.acfun.cn/content_view.aspx?contentId=' + str(i)
+            url = 'http://www.acfun.cn/content_view.aspx?contentId=' + str(i)
             print(url)
 
             try:
